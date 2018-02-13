@@ -9,10 +9,9 @@ import { Http } from '@angular/http';
 export class HomeComponent implements OnInit {
   registerMode = false;
 
-  constructor(private http: Http) { }
+  constructor(private http: Http) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   registerToggle() {
     this.registerMode = true;

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-default">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
@@ -11,7 +11,7 @@
       <a class="navbar-brand" href="#">Dating App</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" save_image_to_download="true">
-      <ul class="nav navbar-nav">
+      <ul *ngIf="loggedIn()" class="nav navbar-nav">
         <li>
           <a href="#">Matches</a>
         </li>
@@ -35,14 +35,12 @@
     </div>
 
     <ul *ngIf="loggedIn()" class="nav navbar-nav navbar-right">
-      <li>
-        <a (click)="logout()">Logout</a>
-      </li>
-      <!-- <li class="dropdown">
-        <a (href="#") class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Welcome
+      <li class="dropdown" dropdown>
+        <a href="#" class="dropdown-toggle" dropdownToggle>
+          Welcome {{authService.decodedToken?.unique_name | titlecase}}
           <span class="caret"></span>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" *dropdownMenu>
           <li>
             <a href="#">
               <i class="fa fa-user"></i> Edit Profile</a>
@@ -53,7 +51,7 @@
               <i class="fa fa-sign-out"></i>Logout</a>
           </li>
         </ul>
-      </li> -->
+      </li>
     </ul>
 
   </div>
