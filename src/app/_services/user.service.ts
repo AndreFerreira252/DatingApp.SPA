@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { Http, Headers, RequestOptions } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { User } from '../_models/User';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+
+import { Injectable } from '@angular/core';
 import { AuthHttp } from 'angular2-jwt';
+import { Observable } from 'rxjs/Observable';
+
+import { environment } from '../../environments/environment';
+import { User } from '../_models/User';
 
 @Injectable()
 export class UserService {
@@ -21,10 +22,16 @@ export class UserService {
       .catch(this.handleError);
   }
 
-  getUser(id): Observable<User>{
+  getUser(id): Observable<User> {
     return this.authHttp
-      .get(this.baseUrl + 'users/' + id )
+      .get(this.baseUrl + 'users/' + id)
       .map(response => <User[]>response.json())
+      .catch(this.handleError);
+  }
+
+  updateUser(id: number, user: User) {
+    return this.authHttp
+      .put(this.baseUrl + 'users/' + id, user)
       .catch(this.handleError);
   }
 
