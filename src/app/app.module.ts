@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { BsDropdownModule, TabsModule, BsDatepickerModule } from 'ngx-bootstrap';
+import { TimeAgoPipe } from 'time-ago-pipe';
 
 import { AuthGuard } from './_guards/auth.guard';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
@@ -41,7 +42,8 @@ import { appRoutes } from './routes';
     MemberCardComponent,
     MemberDetailComponent,
     MemberEditComponent,
-    PhotoEditorComponent
+    PhotoEditorComponent,
+    TimeAgoPipe
   ],
   imports: [
     BrowserModule,

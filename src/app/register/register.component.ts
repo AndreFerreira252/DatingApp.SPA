@@ -78,14 +78,6 @@ export class RegisterComponent implements OnInit {
         }
       );
     }
-    // this.authService.register(this.model).subscribe(
-    //   () => {
-    //     this.alertify.success('Registration successfully');
-    //   },
-    //   error => {
-    //     this.alertify.error(error);
-    //   }
-    // );
   }
 
   cancel() {
