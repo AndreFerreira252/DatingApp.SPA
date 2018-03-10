@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from '../../environments/environment';
 import { User } from '../_models/User';
+import { PaginatedResult } from '../_models/Pagination';
 
 @Injectable()
 export class UserService {
@@ -15,10 +16,35 @@ export class UserService {
 
   constructor(private authHttp: AuthHttp) {}
 
-  getUsers(): Observable<User[]> {
+  getUsers(page?: number, itemsPerPage?: number, userParams?: any) {
+    const paginatedResult: PaginatedResult<User[]> = new PaginatedResult<
+      User[]
+    >();
+    let queryString = '?';
+
+    if (page != null && itemsPerPage != null) {
+      queryString += 'pageNumber=' + page + '&pageSize=' + itemsPerPage + '&';
+    }
+
+    if (userParams != null) {
+      queryString +=
+        'minAge=' + userParams.minAge +
+        '&maxAge=' + userParams.maxAge +
+        '&gender=' + userParams.gender +
+        '&orderBy=' + userParams.orderBy;
+    }
+
     return this.authHttp
-      .get(this.baseUrl + 'users')
-      .map(response => <User[]>response.json())
+      .get(this.baseUrl + 'users' + queryString)
+      .map(response => {
+        paginatedResult.result = response.json();
+
+        if(response.headers.get('Pagination') != null) {
+          paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
+        }
+
+        return paginatedResult;
+      })
       .catch(this.handleError);
   }
 
@@ -42,9 +68,9 @@ export class UserService {
   }
 
   deletePhoto(userId: number, id: number) {
-    return this.authHttp.delete(
-      this.baseUrl + 'users/' + userId + '/photos/' + id
-    ).catch(this.handleError);
+    return this.authHttp
+      .delete(this.baseUrl + 'users/' + userId + '/photos/' + id)
+      .catch(this.handleError);
   }
 
   private handleError(error: any) {
