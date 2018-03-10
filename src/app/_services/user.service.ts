@@ -7,8 +7,8 @@ import { AuthHttp } from 'angular2-jwt';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from '../../environments/environment';
-import { User } from '../_models/User';
 import { PaginatedResult } from '../_models/Pagination';
+import { User } from '../_models/User';
 
 @Injectable()
 export class UserService {
@@ -16,7 +16,7 @@ export class UserService {
 
   constructor(private authHttp: AuthHttp) {}
 
-  getUsers(page?: number, itemsPerPage?: number, userParams?: any) {
+  getUsers(page?: number, itemsPerPage?: number, userParams?: any, likesParam?: string) {
     const paginatedResult: PaginatedResult<User[]> = new PaginatedResult<
       User[]
     >();
@@ -26,12 +26,24 @@ export class UserService {
       queryString += 'pageNumber=' + page + '&pageSize=' + itemsPerPage + '&';
     }
 
+    if (likesParam === 'Likers') {
+      queryString += 'Likers=true&';
+    }
+
+    if (likesParam === 'Likees') {
+      queryString += 'Likees=true&';
+    }
+
     if (userParams != null) {
       queryString +=
-        'minAge=' + userParams.minAge +
-        '&maxAge=' + userParams.maxAge +
-        '&gender=' + userParams.gender +
-        '&orderBy=' + userParams.orderBy;
+        'minAge=' +
+        userParams.minAge +
+        '&maxAge=' +
+        userParams.maxAge +
+        '&gender=' +
+        userParams.gender +
+        '&orderBy=' +
+        userParams.orderBy;
     }
 
     return this.authHttp
@@ -39,8 +51,10 @@ export class UserService {
       .map(response => {
         paginatedResult.result = response.json();
 
-        if(response.headers.get('Pagination') != null) {
-          paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
+        if (response.headers.get('Pagination') != null) {
+          paginatedResult.pagination = JSON.parse(
+            response.headers.get('Pagination')
+          );
         }
 
         return paginatedResult;
@@ -73,7 +87,18 @@ export class UserService {
       .catch(this.handleError);
   }
 
+  sendLike(id: number, recipientId: number) {
+    return this.authHttp
+      .post(this.baseUrl + 'users/' + id + '/like/' + recipientId, {})
+      .catch(this.handleError);
+  }
+
   private handleError(error: any) {
+
+    if (error.status === 400) {
+      return Observable.throw(error._body);
+    }
+
     const appError = error.headers.get('Application-Error');
     if (appError) {
       return Observable.throw(appError);
