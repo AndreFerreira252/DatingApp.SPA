@@ -9,6 +9,8 @@ import { Observable } from 'rxjs/Observable';
 import { environment } from '../../environments/environment';
 import { PaginatedResult } from '../_models/Pagination';
 import { User } from '../_models/User';
+import { Message } from '../_models/Message';
+import { Response } from '@angular/http';
 
 @Injectable()
 export class UserService {
@@ -16,7 +18,12 @@ export class UserService {
 
   constructor(private authHttp: AuthHttp) {}
 
-  getUsers(page?: number, itemsPerPage?: number, userParams?: any, likesParam?: string) {
+  getUsers(
+    page?: number,
+    itemsPerPage?: number,
+    userParams?: any,
+    likesParam?: string
+  ) {
     const paginatedResult: PaginatedResult<User[]> = new PaginatedResult<
       User[]
     >();
@@ -93,8 +100,71 @@ export class UserService {
       .catch(this.handleError);
   }
 
-  private handleError(error: any) {
+  getMessages(
+    id: number,
+    page?: number,
+    itemsPerPage?: number,
+    messageContainer?: string
+  ) {
+    const paginatedResult: PaginatedResult<Message[]> = new PaginatedResult<
+      Message[]
+    >();
+    let queryString = '?MessageContainer=' + messageContainer;
 
+    if (page != null && itemsPerPage != null) {
+      queryString += '&pageNumber=' + page + '&pageSize=' + itemsPerPage;
+    }
+
+    return this.authHttp
+      .get(this.baseUrl + 'users/' + id + '/messages' + queryString)
+      .map((response: Response) => {
+        paginatedResult.result = response.json();
+
+        if (response.headers.get('Pagination') != null) {
+          paginatedResult.pagination = JSON.parse(
+            response.headers.get('Pagination')
+          );
+        }
+
+        return paginatedResult;
+      })
+      .catch(this.handleError);
+  }
+
+  getMessageThread(id: number, recipientId: number) {
+    return this.authHttp
+      .get(this.baseUrl + 'users/' + id + '/messages/thread/' + recipientId)
+      .map((response: Response) => {
+        return response.json();
+      })
+      .catch(this.handleError);
+  }
+
+  sendMessage(id: number, message: Message) {
+    return this.authHttp
+      .post(this.baseUrl + 'users/' + id + '/messages', message)
+      .map((response: Response) => {
+        return response.json();
+      })
+      .catch(this.handleError);
+  }
+
+  deleteMessage(id: number, userId: number) {
+    return this.authHttp
+      .post(this.baseUrl + 'users/' + userId + '/messages/' + id, {})
+      .catch(this.handleError);
+  }
+
+  markAsRead(userId: number, messageId: number) {
+    return this.authHttp
+      .post(
+        this.baseUrl + 'users/' + userId + '/messages/' + messageId + '/read',
+        {}
+      )
+      .subscribe();
+  }
+
+  private handleError(error: any) {
     if (error.status === 400) {
       return Observable.throw(error._body);
     }
